@@ -308,7 +308,7 @@
 			},
 			getBarrage(){//获取弹幕
 				var s = this;
-				$.ajax({
+				/*$.ajax({
 					url:"http://115.231.251.252:26020/web/search/common/weiboCluster/select?word=俄罗斯+沙特+(开幕|换帅|((球员|队员)+受伤)|(主帅+解约)|黄牌|分档|东道主|决赛|预选赛|进球|失球|胜球|犯规|淘汰赛|裁判|教练|禁赛|死球|罚球|点球|任意球|角球|界外球|警告|球门球|违规|判罚|守门员|获胜|冠军|亚军|季军|夺冠|主帅|新帅|停赛|小组赛|输球|突围|世界杯)&starttime=20180614&endtime=20180614&token=f43e78cc-9c39-4583-b7bf-ef3d2fcaa311",
 					data:{},
 					success(data){
@@ -331,7 +331,7 @@
 					}
 				})
 
-				return;
+				return;*/
 				$.getJSON("./assets/data/barrage.json",(data)=>{
 					if(data.code === 0){
 						s.barrageList = data.list;

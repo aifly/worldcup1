@@ -71,6 +71,7 @@
 	import {imgs} from '../lib/assets.js';
 	import zmitiUtil from '../lib/util';
 	import '../lib/html2canvas';
+	import $ from 'jquery';
 	import Point from './point';
 	export default {
 		props:['obserable','nickname','pv'],
@@ -245,7 +246,7 @@
 			getBaseData(){
 				var s = this;
 				$.ajax({
-					url:"http://119.84.122.135:27701/predict/1",
+					url:"http://119.84.122.135:27701/predict/61",
 					success(data){
 						if(typeof data === 'string'){
 							try {
@@ -301,6 +302,10 @@
 			})
 
 			this.initPoints();
+
+			$.ajax({url:"http://119.84.122.135:27701/reply/61"}).done(d=>{console.log('自动回复',JSON.parse(d));})
+			//$.ajax({url:"http://119.84.122.135:27701/predict/61"}).done(d=>{console.log('预测',JSON.parse(d));})
+
 			 
 			 
 
