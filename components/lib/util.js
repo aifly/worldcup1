@@ -29,7 +29,7 @@ var zmitiUtil = {
 	wxConfig: function(title, desc, url, isDebug = false) {
 		var s = this;
 
-		var img = window.baseUrl + '/assets/images/301.jpg';
+		var img = window.baseUrl + '/assets/images/302.jpg';
 
 		var appId = this.wxInfo().wxappid;
 
@@ -141,7 +141,8 @@ var zmitiUtil = {
 		if (!s.isWeiXin()) {
 			return;
 		}
-		var key = 'headimgurl8'
+		var key = 'headimgurl10';
+
 		if(window.localStorage.getItem('nickname') && window.localStorage.getItem(key)){
 			window.nickname = window.localStorage.getItem('nickname')
 			window.headimgurl = window.localStorage.getItem(key);

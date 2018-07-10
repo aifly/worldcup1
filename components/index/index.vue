@@ -36,8 +36,31 @@
 							<div class="zmiti-score">
 								<section>
 									<img :src="imgs.xiaoxinTextBg" alt="">
-									<div :style='{marginTop:!showBtns?"36px":"10px"}'>{{rate}}</div>
-									<div>比分{{team1.score}}:{{team2.score}}</div>
+									<div :style='{marginTop:!showBtns?"36px":"10px"}' v-html='rate'></div>
+									<div class="zmiti-score-C">
+										<div>
+											<div>
+												
+												<img :src="imgs.scoreBg"  />
+												<label></label>
+												<label></label>
+												<label></label>
+											</div>
+											<span>{{team1.score}}</span>
+											
+										</div>
+										<div></div>
+										<div>
+											<div>
+												
+												<img :src="imgs.scoreBg"  />
+												<label></label>
+												<label></label>
+												<label></label>
+											</div>
+											<span>{{team2.score}}</span>
+										</div>
+									</div>
 								</section>
 							</div>
 						</div>
@@ -48,8 +71,7 @@
 						<div v-tap='[entry]'>PK小新</div>
 					</div>
 					<div class="zmiti-copyright">
-						<img :src="imgs.logo" alt="">
-						<span>新媒体中心出品</span>
+						<img :src="imgs.c1" alt="">
 					</div>
 				</div>
 				<canvas :width="viewW" height="900" ref='canvas'>
@@ -137,7 +159,7 @@
 			html2img(){
 				var s = this;
 				this.showBtns = false;
-				this.rate = '我与小新的预测相同'
+				//this.rate = '我与小新的预测相同'
 
 				//zmitiUtil.wxConfig('我是第'+(s.pv)+'位种树者',window.desc)
 				var {obserable} = this;
@@ -267,9 +289,9 @@
 									s.team1 = data.basedata.teams[1];
 									s.team2 = data.basedata.teams[0];
 									if(s.team1.score>s.team2.score){
-										s.rate = '小新通过大数据分析预判'+s.team1.teamname+'队将获胜!';
+										s.rate = '小新通过<br/>大数据分析预判';
 									}else{
-										s.rate = '小新通过大数据分析预判'+s.team2.teamname+'队将获胜!';
+										s.rate = '小新通过大数据分析预判';
 									}
 									//if(data.b)
 								}
@@ -303,7 +325,7 @@
 
 			this.initPoints();
 
-			$.ajax({url:"http://119.84.122.135:27701/reply/61"}).done(d=>{console.log('自动回复',JSON.parse(d));})
+			//$.ajax({url:"http://119.84.122.135:27701/reply/61"}).done(d=>{console.log('自动回复',JSON.parse(d));})
 			//$.ajax({url:"http://119.84.122.135:27701/predict/61"}).done(d=>{console.log('预测',JSON.parse(d));})
 
 			 

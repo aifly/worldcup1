@@ -6,9 +6,10 @@ $bgColor: #4081dd;
 
 .zmiti-index-main-ui {
     overflow: hidden;
-    width: 10rem;
-    left: 50% !important;
-    margin-left: -$viewW / 2;
+    position: fixed !important;
+    width: $viewW;
+    /* left: 50% !important;
+    margin-left: -$viewW / 2; */
     background: $bgColor;
     opacity: 0;
     z-index: -1;
@@ -70,7 +71,7 @@ $bgColor: #4081dd;
 
     &.show {
         opacity: 1;
-        z-index: 200;
+        z-index: 300;
     }
     
     .zmiti-index-logo{
@@ -90,16 +91,15 @@ $bgColor: #4081dd;
     .zmiti-index {
         @include displayBox(vertical);
 
-        & > div {
-			
+        & > div.zmiti-title {
+			height: 80vh;
 			-webkit-box-flex:1;
-            border:2px solid #fff;
         }
 
         .zmiti-index-bottom {
-			height: 100px;
+			height: 200px;
             width: 100%;
-            -webkit-box-flex:none;
+            -webkit-box-flex:0;
             @include pos(r);
             .zmiti-copyright{
                 @include pos(a);
@@ -111,8 +111,7 @@ $bgColor: #4081dd;
                 
                 bottom: 10px;
                 img{
-                    width: 70px;
-                    margin-right: 10px;
+                    width: 260px;
 
                 }
             }
@@ -122,16 +121,15 @@ $bgColor: #4081dd;
 				width: 70%;
                 left: 15%;
                 height: 160px;
-                bottom: 0;
+                bottom: 70px;
                 @include displayBox(horizontal);
                 -webkit-box-pack: justify;
-                display: none;
 				color:#fff;
 				text-align: center;
 				&>div{
 					width: 160px;
-					height: 70px;
-					line-height: 70px;
+					height: 60px;
+					line-height: 60px;
 					background: #770925;
 					@include br(16px);
 					border:2px solid #fff;
@@ -161,14 +159,13 @@ $bgColor: #4081dd;
 		-webkit-box-pack: justify;
 		
         & > img {
-            //margin-left: -3%;
             @include pos(r);
-            top: 136px;
+            top: 200px;
         }
 
         .zmiti-vs {
 			width: $viewW;
-			margin: 2px 0;
+			margin: 150px 0 0 0;
             @include displayBox(horizontal);
             -webkit-box-pack: justify;
 
@@ -212,23 +209,124 @@ $bgColor: #4081dd;
             width: $viewW;
 			@include pos(r);
 			@include displayBox(horizontal);
+
+            &>div{
+                &>img{
+                    margin-top: 100px;
+                }
+            }
 			.zmiti-score{
 				width: 400px;
+                height: 300px;
 				white-space:normal;
 				
+                .zmiti-score-C{
+                    @include displayBox(horizontal);
+                    @include br(15px);
+                    background:#78a1b9;
+                    height: 140px;
+                    left: 80px;
+                    @include pos(a);
+                    width: 78%;
+                    bottom:40px;
+                    margin: 0 auto;
+                    &>div{
+                        height: 100%;
+                        @include displayBox(horizontal);
+                        @include pos(r);
+
+                        &>div{
+                            @include pos(r);
+                        }
+
+                        span{
+                            @include pos(a);
+                            width: 100%;
+                            height: 100%;
+                            text-align: center;
+                            line-height: 150px;
+                            color:#ffe400;
+                            font-size: 50px;
+                            left: 0;
+                            top: 0;
+                            z-index: 12;
+                        }
+
+                        img{
+                            @include pos(r);
+                            width: 100px;
+                            height: auto;
+                            display: block;
+
+                        }
+                        &:nth-of-type(1),&:nth-of-type(3){
+                            overflow: hidden;
+                            -webkit-box-flex:1;
+                            label{
+                                @include pos(a);
+                                left: 0;
+                                bottom:0;
+                                z-index: 10;
+                                width: 33.333%;
+                                height: 6px;
+                                &:nth-of-type(1){
+                                    background:#001d99;
+                                }
+                                &:nth-of-type(2){
+                                    background:#fcfcfc;
+                                    left: 33.3%;
+                                }
+                                &:nth-of-type(3){
+                                    background:#f02432;
+                                    left: 66.67%;
+                                }
+                            }
+                        }
+                        &:nth-of-type(2){
+                            width: 50px;
+                            &:before{
+                                content:"";
+                                width: 40px;
+                                height: 6px;
+                                background:#fff;
+                                @include pos(a);
+                                z-index: 10;
+                                top: 50%;
+                                margin-top: -3px;
+                            }
+                        }
+                        &:nth-of-type(3){
+                            label{
+                                &:nth-of-type(1){
+                                    background:#000000;
+                                }
+                                &:nth-of-type(2){
+                                    background:#fbe32a;
+                                    left: 33.3%;
+                                }
+                               
+                            }
+                        }
+                        
+                    }
+                }
 				section{
 					@include pos(a);
 					top:0px;
+                    ///margin-left: 50px;
 					z-index: 10;
 					word-wrap:break-word;
-					width: 400px;
-					height: 160px;
+					width: 450px;
+					height: 100%;
+                    //border:2px solid #fff;
+                    //background:rgba(255,253,123,.15);
+                    //@include br(10px);
 					///margin-left: 80px;;
 					img{
 						@include pos(a);
 						width: 100%;
 						height: 100%;
-						z-index: -1;
+						z-index: 10;
 					}
 					&>div{
 						color:#777;
@@ -236,7 +334,7 @@ $bgColor: #4081dd;
 						margin-left: 20%;
 						&:nth-of-type(1){
 							margin-top: 10px;
-							color:#d31b19;
+							color:#fff;
 							font-size:32px;
                         }
                         &:nth-of-type(2){

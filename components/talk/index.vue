@@ -8,6 +8,7 @@
 					<div class="zmiti-talk-title">
 						<img :src="imgs.talkTitle" alt="">
 						<div class="zmiti-barrage" v-for='(barrage,i) in barrageList' :key='i'>
+							<img :src="barrage.image" alt="">
 							<span>{{barrage.name}} : </span>
 							<span>{{barrage.content}}</span>
 						</div>
@@ -19,7 +20,7 @@
 									<span>{{team1.teamname}}</span>
 								</div>
 								<div>
-									<img :src="imgs.logo1" alt="">
+									<img style='position:relative' :src="imgs.vs" alt="">
 								</div>
 								<div>
 									<img :src="imgs.team3" alt="">
@@ -40,11 +41,35 @@
 								</div>
 							</div>
 							<div class="zmiti-talk-score">
-								<span>{{team1.score + " ：" + team2.score}}</span>
-								
+								<section class="zmiti-hand" v-if='showHand'>
+									<img :src="imgs.hand" alt="">
+									<span></span>
+								</section>
+								<section class="zmiti-hand1" v-if='showHand'>
+									<img :src="imgs.hand" alt="">
+									<span></span>
+								</section>
+								<div>
+									<div>
+										<img :src="imgs.scoreBg" alt="">
+										<span class="zmiti-talk-score-item">
+											<input type="number" v-model='team1.score'/>
+										</span>
+										<span>{{team1.teamname}}</span>
+									</div>
+									<div>
+										
+									</div>
+									<div>
+										<img :src="imgs.scoreBg" alt="">
+										<span class="zmiti-talk-score-item">
+											<input type="number" v-model='team2.score'/></span>
+										<span>{{team2.teamname}}</span>
+									</div>
+								</div>
 							</div>
 
-							<div class="zmiti-countdown">
+							<div class="zmiti-countdown" v-show='false'>
 								<img :src="imgs.countdownBg" alt="">
 								<span>0{{(countdown/60|0)}} : {{countdown%60<10?'0'+countdown%60:countdown%60}}</span>
 							</div>
@@ -108,8 +133,7 @@
 				</transition>
 				<section v-if='!createImg'>
 					<h1 style="height:100px;">
-						<img :src="imgs.logo" alt="">
-						新华社新媒体中心
+						<img :src="imgs.c1" alt="">
 					</h1>
 					<div class="zmiti-pk" >
 						<div>
@@ -117,11 +141,28 @@
 							<span>{{team1.teamname}}</span>
 						</div>
 						<div>
-							<img :src="imgs.logo1" alt="">
+							<img :src="imgs.vs" alt="">
 						</div>
 						<div>
 							<img :src="imgs.team3" alt="">
 							<span>{{team2.teamname}}</span>
+						</div>
+					</div>
+					<div class="zmiti-talk-score">
+						<div>
+							<div>
+								<img :src="imgs.scoreBg" alt="">
+								<span class="zmiti-talk-score-item">{{team1.score}}</span>
+								<span>{{team1.teamname}}</span>
+							</div>
+							<div>
+								
+							</div>
+							<div>
+								<img :src="imgs.scoreBg" alt="">
+								<span class="zmiti-talk-score-item">{{team2.score}}</span>
+								<span>{{team2.teamname}}</span>
+							</div>
 						</div>
 					</div>
 					<div class="zmiti-result-content">
@@ -187,6 +228,7 @@
 				showTeam: false,
 				showQrcode: false,
 				show: false,
+				showHand:true,
 				team1:{},
 				points:"",
 				team2:{},
@@ -335,6 +377,7 @@
 				$.getJSON("./assets/data/barrage.json",(data)=>{
 					if(data.code === 0){
 						s.barrageList = data.list;
+						s.barrageList.length = 5;
 					}
 				});
 			},
@@ -357,6 +400,8 @@
 					}, 1000);
 					return;
 				}
+				this.headimgurl = window.headimgurl || imgs.logo;
+				this.nickname = window.nickname||'新华社网友'; 
 				$.ajax({
 					url:"http://h5.zhongguowangshi.com/interface/public/index.php?s=v2/user/saveh5userinfo",
 					type:'post',
@@ -419,7 +464,7 @@
 				}); */
 				$.ajax({
 					type:'get',
-					url:'http://119.84.122.135:27701/reply/1',
+					url:'http://119.84.122.135:27701/reply/61',
 					data:{
 						
 					},
@@ -517,6 +562,10 @@
 				this.points = data.points;
 				var iNow = 0;
 
+
+				setTimeout(()=>{
+					this.showHand = false;
+				},2000)
 				
 				this.timer = setInterval(()=>{
 					if(this.stop){

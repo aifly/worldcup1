@@ -8,6 +8,7 @@ $color: #fffb88;
 .zmiti-talk-main-ui {
     opacity: 0;
     z-index: -1;
+    position: fixed !important;
     background: #fdf7eb;
     @include displayBox(vertical);
 
@@ -81,7 +82,7 @@ $color: #fffb88;
                  &>div:nth-of-type(2) {
                      &>div{
                          &:nth-of-type(1){
-                             font-size:50px;
+                             font-size:70px;
                              font-weight: bold;
                          }
                          &:nth-of-type(2){
@@ -96,7 +97,7 @@ $color: #fffb88;
             line-height: 120px;;
             padding-left: 50px;
             img{
-                width: 50px;
+                width: 250px;
                 
             }
             font-size:22px;
@@ -278,13 +279,17 @@ $color: #fffb88;
             color: #fff;
             -webkit-animation: move 4s linear infinite;
             width: 100%;
+            img{
+                width: 40px;
+                @include br();
+            }
         }
 
-        @for $i from 1 through 50 {
+        @for $i from 1 through 30 {
            
             .zmiti-barrage:nth-of-type(#{$i}){
                 $time:6s;
-                -webkit-animation: move 5s *$i linear infinite;
+                -webkit-animation: move 8s *random(5) $i*2s  linear infinite;
                 
                 @if $i % 3 == 0 {
                     top:40px;
@@ -390,13 +395,153 @@ $color: #fffb88;
             }
         }
 
-        .zmiti-talk-score {
-            text-align: center;
+        @at-root.zmiti-talk-score {
+            @include pos(r);
+            /* text-align: center;
             color: #fff;
             font-size: 50px;
             letter-spacing: 20px;
             font-weight: bold;
-            margin-top: -20px;
+            margin-top: -20px; */
+            .zmiti-hand,.zmiti-hand1{
+                @include pos(a);
+                left: 58%;
+                top:60px;
+                z-index: 101;
+                img{
+                    width:70px;
+
+                }
+
+                span{
+                    @include transform(translate3d(-26%, -45%, 0));
+                    @include animation(scale 1s infinite);
+                    @include pos(a);
+                    width: 1rem;
+                    height: 1rem;
+                    @include br();
+                    opacity: .5;
+                    background: rgba(238, 101, 19, .5);
+                    background: #fff;
+                    left: 0;
+                    top: 0;
+                }
+
+            }
+            .zmiti-hand1{
+                left:38%;
+                span{
+                    @include animation(scale 1s .5s infinite);
+                }
+            }
+
+
+            @-webkit-keyframes scale {
+                from {
+                    @include transform(translate3d(-26%, -45%, 0) scale(0));
+                    opacity: 1;
+                }
+
+                to {
+                    @include transform(translate3d(-26%, -45%, 0) scale(1.4));
+                    opacity: 0;
+                }
+
+            }
+
+            &>div{
+                @include displayBox(horizontal);
+                background:#3e7d9d;
+                @include br(20px);
+                border:6px solid #95ccf3;
+                box-sizing:border-box;
+                width: 360px;
+                height: 150px;
+                margin: 10px auto;
+                text-align: center;
+                color:#ffe400;
+                font-size: 24px;
+                img{
+                    position: absolute !important;
+                }
+
+                .zmiti-talk-score-item{
+                    font-size:50px;
+                    @include pos(r);
+                    width: 100px;
+                    height: 100px;
+                    display: block;
+                    left:0;
+                    top: 0;
+
+
+
+                    line-height: 120px;
+                    &:before{
+                        content:"";
+                        @include pos(a);
+                        width: 80%;
+                        left: 10%;
+                        z-index: 10;
+                        height:3px;
+                        background:#fefefe;
+                        top: 90px;
+
+                    }
+                    input[type=number]{
+                        border:none;
+                        -webkit-appearance: none;
+                        font-size:50px;
+                        color:#ffe400;
+                        z-index: 100;
+                        text-align: center;
+                        @include pos(a);
+                        display: block;
+
+                        width: 30px;
+                        left: 50%;
+                        top: 50%;
+
+                        @include transform(translate3d(-50%,-50%,0));
+
+                        background:transparent;
+
+                        @-webkit-keyframes flash{
+                            to{
+                                border-width:0;
+                            }
+                        }
+
+                    }
+                }
+                &>div{
+                    @include pos(r);
+                    &:nth-of-type(1),&:nth-of-type(3){
+                        img{
+                            width: 100px;
+                            height: auto;
+                            @include pos(r);
+                            display: block;
+                        }
+                    }
+                    &:nth-of-type(2){
+                        width: 50px;
+                        height: 100%;
+                        &:before{
+                            content:"";
+                            width: 30px;
+                            height: 6px;
+                            left: 50%;
+                            @include transform(translate(-50%,0));
+                            background:#fff;
+                            @include pos(a);
+                            z-index: 10;
+                            top: 50%;
+                            margin-top: -3px;
+                        }
+                    }
+                }
+            }
         }
 
         .zmiti-countdown {
@@ -433,13 +578,14 @@ $color: #fffb88;
          @include displayBox(horizontal);
          &>div{
              @include pos(r);
+             width: 600px;
              input{
-                 width: 310px;
-                 height: 50px;
+                 width: 420px;
+                 height: 60px;
                  @include pos(a);
-                 margin-top: -90px;
+                 margin-top: -130px;
                  left: 50%;
-                 margin-left: -170px;
+                 margin-left: -220px;
                  outline: none;
                  -webkit-appearance: none;
                  border:1px solid #ccc;
