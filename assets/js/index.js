@@ -22926,11 +22926,11 @@
 	// 									<img :src="imgs.hand" alt="">
 	// 									<span></span>
 	// 								</section>
-	// 								<div>
+	// 								<div v-tap='[showCountdownPage]'>
 	// 									<div>
 	// 										<img :src="imgs.scoreBg" alt="">
 	// 										<span class="zmiti-talk-score-item">
-	// 											<input type="number" v-model='team1.score'/>
+	// 											{{team1.score}}
 	// 										</span>
 	// 										<span>{{team1.teamname}}</span>
 	// 									</div>
@@ -22940,7 +22940,8 @@
 	// 									<div>
 	// 										<img :src="imgs.scoreBg" alt="">
 	// 										<span class="zmiti-talk-score-item">
-	// 											<input type="number" v-model='team2.score'/></span>
+	// 											{{team2.score}}
+	// 										</span>
 	// 										<span>{{team2.teamname}}</span>
 	// 									</div>
 	// 								</div>
@@ -23066,7 +23067,9 @@
 	// 					<img :src="imgs.arrow">
 	// 				</div>
 	// 			</div>
+	// 			<Countdown v-if='show' :obserable='obserable' :team1='team1' :team2='team2'>
 	//
+	// 			</Countdown>
 	// 			<Toast :msg='errorMsg'></Toast>
 	// 		</div>
 	//
@@ -23084,13 +23087,17 @@
 
 	__webpack_require__(21);
 
+	var _countdownIndex = __webpack_require__(23);
+
+	var _countdownIndex2 = _interopRequireDefault(_countdownIndex);
+
 	var _libAssetsJs = __webpack_require__(13);
 
-	var _toastToast = __webpack_require__(23);
+	var _toastToast = __webpack_require__(28);
 
 	var _toastToast2 = _interopRequireDefault(_toastToast);
 
-	var _iscroll = __webpack_require__(28);
+	var _iscroll = __webpack_require__(33);
 
 	var _iscroll2 = _interopRequireDefault(_iscroll);
 
@@ -23101,10 +23108,6 @@
 	var _libUtil = __webpack_require__(14);
 
 	var _libUtil2 = _interopRequireDefault(_libUtil);
-
-	var _teamIndex = __webpack_require__(29);
-
-	var _teamIndex2 = _interopRequireDefault(_teamIndex);
 
 	exports['default'] = {
 
@@ -23122,9 +23125,13 @@
 				showQrcode: false,
 				show: false,
 				showHand: true,
-				team1: {},
+				team1: {
+					score: 0
+				},
 				points: "",
-				team2: {},
+				team2: {
+					score: 0
+				},
 				nickname: '',
 				headimgurl: '',
 				createImg: "",
@@ -23146,11 +23153,20 @@
 		},
 
 		components: {
-			Team: _teamIndex2['default'],
-			Toast: _toastToast2['default']
+			Toast: _toastToast2['default'],
+			Countdown: _countdownIndex2['default']
 		},
 		methods: {
+			showCountdownPage: function showCountdownPage() {
+				var obserable = this.obserable;
 
+				obserable.trigger({
+					type: "toggleCountdownPage",
+					data: {
+						show: true
+					}
+				});
+			},
 			hideMask: function hideMask() {
 				this.showMasks = false;
 			},
@@ -23437,16 +23453,31 @@
 			var _this3 = this;
 
 			window.s = this;
+			var obserable = this.obserable;
 
 			this.scroll = new _iscroll2['default'](this.$refs['page'], {
 				scrollbars: true
 			});
-
 			///bounce:false
+			obserable.on('fillScore', function (data) {
+				_this3.team1.score = data.score1;
+				_this3.team2.score = data.score2;
+			});
+
+			obserable.on('showResultPage', function () {
+				_this3.stop = true;
+				clearInterval(_this3.timer);
+				setTimeout(function () {
+					if (_this3.viewH - 100 - 350 - _this3.$refs['ul'].offsetHeight <= 0) {
+						_this3.scroll.scrollTo(0, _this3.viewH - 100 - 350 - _this3.$refs['ul'].offsetHeight, 100);
+					}
+					_this3.scroll.refresh();
+					_this3.showTel = true;
+				}, 500);
+			});
+
 			this.getBarrage();
 			this.getTalk();
-			var obserable = this.obserable;
-
 			obserable.on('entryTalk', function (data) {
 
 				_this3.show = true;
@@ -23555,9 +23586,281 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__webpack_require__(24)
-	__vue_script__ = __webpack_require__(26)
+	__vue_script__ = __webpack_require__(24)
 	__vue_template__ = __webpack_require__(27)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "E:\\project\\worldcup1\\components\\countdown\\index.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// <template>
+	// 	<transition name="countdown">
+	// 		<div v-if='showCountdown' class="zmiti-countdown-main-ui" @touchend='touchend' @touchstart='getStartArea($event)' @touchmove="modifyScore">
+	// 			<span></span>
+	// 			<div class="zmiti-countdown-sure" v-tap='[getScore]'>确定</div>
+	// 			<section class="zmiti-countdown-box">
+	// 				<div class="zmiti-countdown-main" :class="{'active':isTransition}" :style="{WebkitTransform:'rotateX('+rotate+'deg)'}">
+	// 					<div>
+	// 						<span>0</span>
+	// 						<div>
+	// 							<span>1</span>
+	// 							<div>
+	// 								<span>2</span>
+	// 								<div>
+	// 									<span>3</span>
+	// 									<div>
+	// 										<span>4</span>
+	// 										<div>
+	// 											<span>5</span>
+	// 											<div>
+	// 												<span>6</span>
+	// 												<div>
+	// 													<span>7</span>
+	// 													<div>
+	// 														<span>8</span>
+	// 														<div>
+	// 															<span>9</span>
+	// 															<div>
+	// 																<span>10</span>
+	// 															</div>
+	// 														</div>
+	// 													</div>
+	// 												</div>
+	// 											</div>
+	// 										</div>
+	// 									</div>
+	// 								</div>
+	// 							</div>
+	//
+	// 						</div>
+	// 					</div>
+	// 				</div>
+	// 			</section>
+	// 			<section class="zmiti-countdown-box">
+	// 				<div class="zmiti-countdown-main" :class="{'active':isTransition}" :style="{WebkitTransform:'rotateX('+rotate1+'deg)'}">
+	// 					<div>
+	// 						<span>0</span>
+	// 						<div>
+	// 							<span>1</span>
+	// 							<div>
+	// 								<span>2</span>
+	// 								<div>
+	// 									<span>3</span>
+	// 									<div>
+	// 										<span>4</span>
+	// 										<div>
+	// 											<span>5</span>
+	// 											<div>
+	// 												<span>6</span>
+	// 												<div>
+	// 													<span>7</span>
+	// 													<div>
+	// 														<span>8</span>
+	// 														<div>
+	// 															<span>9</span>
+	// 															<div>
+	// 																<span>10</span>
+	// 															</div>
+	// 														</div>
+	// 													</div>
+	// 												</div>
+	// 											</div>
+	// 										</div>
+	// 									</div>
+	// 								</div>
+	// 							</div>
+	//
+	// 						</div>
+	// 					</div>
+	// 				</div>
+	// 			</section>
+	// 		</div>
+	// 	</transition>
+	// </template>
+	//
+	// <script>
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	__webpack_require__(25);
+
+	var _libUtil = __webpack_require__(14);
+
+	var _libUtil2 = _interopRequireDefault(_libUtil);
+
+	exports['default'] = {
+		props: ['obserable', 'team1', 'team2'],
+		name: 'zmitiindex',
+		data: function data() {
+			return {
+				rotate: 180,
+				rotate1: 180,
+				type: 'rotate',
+				score1: 0,
+				score2: 0,
+				scoreType: 'score1',
+				viewW: window.innerWidth,
+				transY: 0,
+				isTransition: false,
+				showCountdown: false
+
+			};
+		},
+		components: {},
+
+		methods: {
+
+			getStartArea: function getStartArea(e) {
+				var e = e.changedTouches[0];
+				this.type = e.pageX < this.viewW / 2 ? 'rotate' : 'rotate1';
+				this.scoreType = e.pageX < this.viewW / 2 ? 'score1' : 'score2';
+				this.transY = e.pageY;
+				this.isTransition = false;
+			},
+
+			modifyScore: function modifyScore(e) {
+				var oneAng = 360 / 11;
+				var e = e.changedTouches[0];
+				this[this.type] += (this.transY - e.pageY) / 20;
+			},
+			touchend: function touchend(e) {
+				this.isTransition = true;
+				var oneAng = 360 / 11;
+				var e = e.changedTouches[0];
+				var scale = (this[this.type] - 180) / oneAng | 0;
+				this[this.type] = 180 + scale * oneAng;
+				if (this.transY > e.pageY) {
+
+					this[this.scoreType] = 11 - Math.abs(scale) % 11;
+					///console.log(this[this.scoreType],'score1');
+				} else {
+						this[this.scoreType] = Math.abs(scale) % 11;
+					}
+
+				//console.log(this[this.scoreType],this.scoreType,(this[this.type]-180));
+				this.transY = e.pageY;
+
+				//this[this.type] = scale * oneAng +180;
+				///this[this.type] %= 360;
+				//this[this.type] += this[this.type] % oneAng;
+			},
+			getScore: function getScore() {
+				var obserable = this.obserable;
+
+				console.log(obserable);
+				var s = this;
+				obserable.trigger({
+					type: 'fillScore',
+					data: {
+						score1: s.score1,
+						score2: s.score2
+					}
+				});
+
+				obserable.trigger({
+					type: 'toggleCountdownPage',
+					data: {
+						show: false
+					}
+				});
+
+				obserable.trigger({
+					type: "showResultPage"
+				});
+			}
+
+		},
+		mounted: function mounted() {
+			var _this = this;
+
+			this.rotate -= this.team1.score * 360 / 11;
+			this.rotate1 -= this.team2.score * 360 / 11;
+			this.score1 = this.team1.score;
+			this.score2 = this.team2.score;
+			var obserable = this.obserable;
+
+			obserable.on('toggleCountdownPage', function (data) {
+				_this.showCountdown = data.show;
+			});
+		}
+	};
+
+	// </script>
+	module.exports = exports['default'];
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(26);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(8)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./index.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./index.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(7)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".lt-full {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n}\r\n\r\n.zmiti-text-overflow {\r\n  overflow: hidden;\r\n  white-space: nowrap;\r\n  word-break: break-all;\r\n  text-overflow: ellipsis;\r\n  -webkit-text-overflow: ellipsis;\r\n}\r\n\r\n.zmiti-play {\r\n  width: .8rem;\r\n  height: .8rem;\r\n  border-radius: 50%;\r\n  position: fixed;\r\n  z-index: 1000;\r\n  right: .5rem;\r\n  top: .5rem;\r\n}\r\n\r\n.zmiti-play.rotate {\r\n  -webkit-animation: rotate 5s linear infinite;\r\n  animation: rotate 5s linear infinite;\r\n}\r\n\r\n@-webkit-keyframes rotate {\r\n  to {\r\n    -webkit-transform: rotate(360deg);\r\n    transform: rotate(360deg);\r\n  }\r\n}\r\n\r\n.zmiti-countdown-main-ui {\r\n  width: 750px;\r\n  height: 300px;\r\n  position: fixed;\r\n  z-index: 1000;\r\n  left: 0;\r\n  bottom: 0;\r\n  -webkit-transform: translate3d(0, 0, 0);\r\n  transform: translate3d(0, 0, 0);\r\n  background: #fff;\r\n  display: -webkit-box;\r\n  -webkit-box-align: center;\r\n  -webkit-box-pack: center;\r\n  -webkit-box-orient: horizontal;\r\n}\r\n\r\n.zmiti-countdown-main-ui.countdown-enter-active, .zmiti-countdown-main-ui.countdown-leave-active {\r\n  -webkit-transition: 0.5s;\r\n  transition: 0.5s;\r\n}\r\n\r\n.zmiti-countdown-main-ui.countdown-enter, .zmiti-countdown-main-ui.countdown-leave-to {\r\n  -webkit-transform: translate3d(0, 100%, 0);\r\n  transform: translate3d(0, 100%, 0);\r\n}\r\n\r\n.zmiti-countdown-main-ui:before, .zmiti-countdown-main-ui:after {\r\n  content: '';\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 125px;\r\n  background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.4));\r\n  left: 0;\r\n  top: 0;\r\n  z-index: 10;\r\n}\r\n\r\n.zmiti-countdown-main-ui:after {\r\n  bottom: 0;\r\n  top: auto;\r\n  background-image: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.4));\r\n}\r\n\r\n.zmiti-countdown-main-ui > span {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 50px;\r\n  border-top: 1px solid #ccc;\r\n  border-bottom: 1px solid #ccc;\r\n  z-index: 22;\r\n  left: 0;\r\n  top: 125px;\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-sure {\r\n  position: absolute;\r\n  right: 10px;\r\n  top: 10px;\r\n  border: 1px solid #000;\r\n  padding: 0 8px;\r\n  height: 50px;\r\n  line-height: 50px;\r\n  font-size: 28px;\r\n  border-radius: 4px;\r\n  text-align: center;\r\n  z-index: 100;\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-box {\r\n  margin: 0 50px;\r\n  width: 50px;\r\n  height: 50px;\r\n  border: 1px solid #fff;\r\n  perspective: 800px;\r\n  -webkit-perspective: 800px;\r\n  backface-visibility: hidden;\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-box:hover .zmiti-countdown-main {\r\n  -webkit-transform: rotateX(360deg);\r\n  transform: rotateX(360deg);\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-main {\r\n  -webkit-transform-origin: center center 85.142px;\r\n  transform-origin: center center 85.142px;\r\n  width: 50px;\r\n  backface-visibility: hidden;\r\n  -webkit-transition: 0.4s;\r\n  transition: 0.4s;\r\n  height: 50px;\r\n  position: relative;\r\n  -webkit-transform-style: preserve-3d;\r\n  transform-style: preserve-3d;\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-main.active {\r\n  -webkit-transition: 1s;\r\n  transition: 1s;\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-main div {\r\n  backface-visibility: hidden;\r\n  position: absolute;\r\n  -webkit-transform-style: preserve-3d;\r\n  transform-style: preserve-3d;\r\n  left: 0;\r\n  top: 50px;\r\n  transform-origin: top;\r\n  -webkit-transform-origin: top;\r\n  -webkit-transform: rotateX(32.73deg);\r\n  transform: rotateX(32.73deg);\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-main > div {\r\n  top: 0;\r\n  -webkit-transform: rotateX(0);\r\n  transform: rotateX(0);\r\n}\r\n\r\n.zmiti-countdown-main-ui .zmiti-countdown-main span {\r\n  width: 50px;\r\n  height: 50px;\r\n  display: block;\r\n  border-top: 1px solid #fefefe;\r\n  box-sizing: border-box;\r\n  background: #fff;\r\n  text-align: center;\r\n  line-height: 50px;\r\n  -webkit-transform: rotateX(180deg);\r\n  transform: rotateX(180deg);\r\n}\r\n", ""]);
+
+	// exports
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<transition name=\"countdown\">\r\n\t\t<div v-if='showCountdown' class=\"zmiti-countdown-main-ui\" @touchend='touchend' @touchstart='getStartArea($event)' @touchmove=\"modifyScore\">\r\n\t\t\t<span></span>\r\n\t\t\t<div class=\"zmiti-countdown-sure\" v-tap='[getScore]'>确定</div>\r\n\t\t\t<section class=\"zmiti-countdown-box\">\r\n\t\t\t\t<div class=\"zmiti-countdown-main\" :class=\"{'active':isTransition}\" :style=\"{WebkitTransform:'rotateX('+rotate+'deg)'}\">\r\n\t\t\t\t\t<div>\r\n\t\t\t\t\t\t<span>0</span>\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<span>1</span>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<span>2</span>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<span>3</span>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t<span>4</span>\r\n\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t<span>5</span>\r\n\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span>6</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span>7</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span>8</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span>9</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span>10</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</section>\r\n\t\t\t<section class=\"zmiti-countdown-box\">\r\n\t\t\t\t<div class=\"zmiti-countdown-main\" :class=\"{'active':isTransition}\" :style=\"{WebkitTransform:'rotateX('+rotate1+'deg)'}\">\r\n\t\t\t\t\t<div>\r\n\t\t\t\t\t\t<span>0</span>\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<span>1</span>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<span>2</span>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<span>3</span>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t<span>4</span>\r\n\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t<span>5</span>\r\n\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span>6</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span>7</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span>8</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span>9</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span>10</span>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</section>\r\n\t\t</div>\r\n\t</transition>\r\n";
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__webpack_require__(29)
+	__vue_script__ = __webpack_require__(31)
+	__vue_template__ = __webpack_require__(32)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
@@ -23574,13 +23877,13 @@
 	})()}
 
 /***/ }),
-/* 24 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(25);
+	var content = __webpack_require__(30);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(8)(content, {});
@@ -23600,7 +23903,7 @@
 	}
 
 /***/ }),
-/* 25 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(7)();
@@ -23614,7 +23917,7 @@
 
 
 /***/ }),
-/* 26 */
+/* 31 */
 /***/ (function(module, exports) {
 
 	// <template>
@@ -23657,13 +23960,13 @@
 	module.exports = exports['default'];
 
 /***/ }),
-/* 27 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	module.exports = "\r\n\t<div class=\"zmiti-toast-main-ui\" :class='{\"hide\":msg === \"\"}'>\r\n\t\t{{msg}}\r\n\t</div>\r\n";
 
 /***/ }),
-/* 28 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*! iScroll v5.2.0 ~ (c) 2008-2016 Matteo Spinelli ~ http://cubiq.org/license */
@@ -25760,205 +26063,10 @@
 
 
 /***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(30)
-	__vue_template__ = __webpack_require__(33)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), true)
-	  if (!hotAPI.compatible) return
-	  var id = "E:\\project\\worldcup1\\components\\team\\index.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// <template>
-	// 	<transition name="team">
-	// 		<div v-tap='[hideTeam]' v-show='showTeam' class="lt-full zmiti-team-main-ui" :style="{background:'url('+imgs.teamBg+') no-repeat center center',backgroundSize:'cover'}">
-	// 			<div class="zmiti-team-main">
-	// 				<div>
-	// 					<aside>
-	// 						出品人
-	// 					</aside>
-	// 					<aside>
-	// 						<span>陈凯星、</span> <span>冯瑛冰、</span><span>杨维成</span>
-	// 					</aside>
-	// 				</div>
-	// 				<div>
-	// 					<aside>
-	// 						总监制
-	// 					</aside>
-	// 					<aside>
-	// 						<span>葛素表、</span><span>刘元旭</span>
-	// 					</aside>
-	// 				</div>
-	//
-	// 				<div>
-	// 					<aside>
-	// 						策<label for="">策</label>划
-	// 					</aside>
-	// 					<aside>
-	// 						<span>陈知春</span>
-	// 					</aside>
-	// 				</div>
-	//
-	// 				<div>
-	// 					<aside>
-	// 						监<label for="">人</label>制
-	// 					</aside>
-	// 					<aside>
-	// 						<span>牟　帆</span>
-	// 					</aside>
-	// 				</div>
-	//
-	// 				<div>
-	// 					<aside>
-	// 						记<label for="">人</label>者
-	// 					</aside>
-	// 					<aside>
-	// 						<span>毛振华</span>
-	// 					</aside>
-	// 				</div>
-	// 				<div>
-	// 					<aside>
-	// 						文<label for="">人</label>案
-	// 					</aside>
-	// 					<aside>
-	// 						<span>李京泽</span>
-	// 					</aside>
-	// 				</div>
-	// 				<div>
-	// 					<aside>
-	// 						制<label for="">人</label>作
-	// 					</aside>
-	// 					<aside>
-	// 						<span>麟腾传媒</span>
-	// 					</aside>
-	// 				</div>
-	// 				<div>
-	// 					新华社新媒体中心、新华社天津分社联合出品
-	// 				</div>
-	// 			</div>
-	// 		</div>
-	// 	</transition>
-	// </template>
-	//
-	// <script>
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	__webpack_require__(31);
-
-	var _libAssetsJs = __webpack_require__(13);
-
-	var _libUtil = __webpack_require__(14);
-
-	var _libUtil2 = _interopRequireDefault(_libUtil);
-
-	exports['default'] = {
-		props: ['obserable'],
-		name: 'zmitiindex',
-		data: function data() {
-			return {
-				imgs: _libAssetsJs.imgs,
-				show: true,
-				showTeam: false
-			};
-		},
-		components: {},
-
-		methods: {
-
-			imgStart: function imgStart(e) {
-				e.preventDefault();
-			},
-			hideTeam: function hideTeam() {
-				this.showTeam = false;
-			}
-
-		},
-		mounted: function mounted() {
-			var _this = this;
-
-			this.obserable.on('showTeam', function () {
-
-				_this.showTeam = true;
-			});
-		}
-	};
-
-	// </script>
-	module.exports = exports['default'];
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(32);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(8)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../node_modules/css-loader/index.js!./index.css", function() {
-				var newContent = require("!!../../node_modules/css-loader/index.js!./index.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "@charset \"UTF-8\";\r\n.lt-full {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n}\r\n\r\n.zmiti-text-overflow {\r\n  overflow: hidden;\r\n  white-space: nowrap;\r\n  word-break: break-all;\r\n  text-overflow: ellipsis;\r\n  -webkit-text-overflow: ellipsis;\r\n}\r\n\r\n.zmiti-play {\r\n  width: .8rem;\r\n  height: .8rem;\r\n  border-radius: 50%;\r\n  position: fixed;\r\n  z-index: 1000;\r\n  right: .5rem;\r\n  top: .5rem;\r\n}\r\n\r\n.zmiti-play.rotate {\r\n  -webkit-animation: rotate 5s linear infinite;\r\n  animation: rotate 5s linear infinite;\r\n}\r\n\r\n@-webkit-keyframes rotate {\r\n  to {\r\n    -webkit-transform: rotate(360deg);\r\n    transform: rotate(360deg);\r\n  }\r\n}\r\n\r\n.zmiti-team-main-ui {\r\n  z-index: 102222;\r\n  display: -webkit-box;\r\n  -webkit-box-align: center;\r\n  -webkit-box-pack: center;\r\n  -webkit-box-orient: horizontal;\r\n}\r\n\r\n.zmiti-team-main-ui.team-enter-active, .zmiti-team-main-ui.team-leave-active {\r\n  -webkit-transition: 0.5s;\r\n  transition: 0.5s;\r\n}\r\n\r\n.zmiti-team-main-ui.team-enter, .zmiti-team-main-ui.team-leave-to {\r\n  opacity: 0;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main {\r\n  width: 67%;\r\n  color: #b37e16;\r\n  min-height: 500px;\r\n  font-size: 28px;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div {\r\n  margin-top: 20px;\r\n  display: -webkit-box;\r\n  -webkit-box-align: center;\r\n  -webkit-box-pack: center;\r\n  -webkit-box-orient: horizontal;\r\n  -webkit-box-pack: justify;\r\n  -webkit-box-align: start;\r\n  width: 100%;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div aside:nth-of-type(1) {\r\n  font-weight: bold;\r\n  width: 90px;\r\n  display: -webkit-box;\r\n  -webkit-box-align: center;\r\n  -webkit-box-pack: center;\r\n  -webkit-box-orient: horizontal;\r\n  -webkit-box-pack: justify;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div aside:nth-of-type(1) label {\r\n  opacity: 0;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div aside:nth-of-type(2) {\r\n  -webkit-box-flex: 1;\r\n  margin-left: 20px;\r\n  position: relative;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div aside:nth-of-type(2):before {\r\n  content: \"\\FF1A\";\r\n  position: absolute;\r\n  left: -26px;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div aside.zmiti-chupin:before {\r\n  content: \"\\FF1A\";\r\n  position: absolute;\r\n  left: -28px;\r\n}\r\n\r\n.zmiti-team-main-ui .zmiti-team-main > div:nth-of-type(1) span:nth-of-type(1) {\r\n  letter-spacing: 0;\r\n}\r\n", ""]);
-
-	// exports
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports) {
-
-	module.exports = "\r\n\t<transition name=\"team\">\r\n\t\t<div v-tap='[hideTeam]' v-show='showTeam' class=\"lt-full zmiti-team-main-ui\" :style=\"{background:'url('+imgs.teamBg+') no-repeat center center',backgroundSize:'cover'}\">\r\n\t\t\t<div class=\"zmiti-team-main\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t出品人\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>陈凯星、</span> <span>冯瑛冰、</span><span>杨维成</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t总监制\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>葛素表、</span><span>刘元旭</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t策<label for=\"\">策</label>划\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>陈知春</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t监<label for=\"\">人</label>制\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>牟　帆</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t记<label for=\"\">人</label>者\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>毛振华</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t文<label for=\"\">人</label>案\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>李京泽</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t制<label for=\"\">人</label>作\r\n\t\t\t\t\t</aside> \r\n\t\t\t\t\t<aside>\r\n\t\t\t\t\t\t<span>麟腾传媒</span>\r\n\t\t\t\t\t</aside>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t新华社新媒体中心、新华社天津分社联合出品\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</transition>\r\n";
-
-/***/ }),
 /* 34 */
 /***/ (function(module, exports) {
 
-	module.exports = "\r\n\t<transition name='main'>\r\n\t\r\n\t\t<div class=\"lt-full zmiti-talk-main-ui \" :class=\"{'show':show}\" >\r\n\t\t\t\r\n\t\t\t<section class=\"\"  :style=\"{height:viewH-100+'px',position:'relative'}\">\r\n\t\t\t\t<div  ref='page1' >\r\n\t\t\t\t\t<div class=\"zmiti-talk-title\">\r\n\t\t\t\t\t\t<img :src=\"imgs.talkTitle\" alt=\"\">\r\n\t\t\t\t\t\t<div class=\"zmiti-barrage\" v-for='(barrage,i) in barrageList' :key='i'>\r\n\t\t\t\t\t\t\t<img :src=\"barrage.image\" alt=\"\">\r\n\t\t\t\t\t\t\t<span>{{barrage.name}} : </span>\r\n\t\t\t\t\t\t\t<span>{{barrage.content}}</span>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<section class=\"zmiti-talk-pk-C\">\r\n\t\t\t\t\t\t\t<div class=\"zmiti-pk\" >\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team4\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img style='position:relative' :src=\"imgs.vs\" alt=\"\">\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team3\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"zmiti-pk\" v-show='false'>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team1Ico\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.pk\" alt=\"\">\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team2Ico\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"zmiti-talk-score\">\r\n\t\t\t\t\t\t\t\t<section class=\"zmiti-hand\" v-if='showHand'>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.hand\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t\t<section class=\"zmiti-hand1\" v-if='showHand'>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.hand\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" v-model='team1.score'/>\r\n\t\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">\r\n\t\t\t\t\t\t\t\t\t\t\t<input type=\"number\" v-model='team2.score'/></span>\r\n\t\t\t\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"zmiti-countdown\" v-show='false'>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.countdownBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span>0{{(countdown/60|0)}} : {{countdown%60<10?'0'+countdown%60:countdown%60}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</section>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-talk-content\" :style=\"{background:'url('+imgs.talkBg+') repeat-y',height:viewH-100-350+'px'}\" ref='page'>\r\n\t\t\t\t\t\t<ul ref='ul'>\r\n\t\t\t\t\t\t\t<li style=\"height:100px;\"></li>\r\n\t\t\t\t\t\t\t<li style=\"text-align:center;\r\n\t\t\t\t\t\t\tdisplay:block\">\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.logo3\" alt=\"\" style=\"margin:0 auto;\">\r\n\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t<li v-if='i<=index' v-for='(talk,i) in talkList' :key=\"i\" :class=\"{'right':talk.className}\">\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img class=\"zmiti-headimg\" :src=\"talk.headimgurl\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span>{{talk.nickname}}</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.text'>{{talk.text}}</div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.text && false' style=\"opacity:0;padding:0;\">{{talk.text}}</div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.image' class=\"zmiti-talk-img\">\r\n\t\t\t\t\t\t\t\t\t\t<img  :src=\"talk.image\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.videoposter' class=\"zmiti-talk-img\">\r\n\t\t\t\t\t\t\t\t\t\t<img  :src=\"talk.videoposter\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t<li style=\"height:100px;\"></li>\r\n\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</section>\r\n\t\t\t<div class=\"zmiti-talk-form\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<input type=\"text\" v-model=\"text\" @focus='focus' ref='text'  @blur='blur'>\r\n\t\t\t\t\t<span :class=\"{'active':text.length>0}\" v-tap='[send]'>发送</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-result lt-full\" ref='page2' v-if='result'>\r\n\t\t\t\t<img :src=\"result\" alt=\"\" @touchstart='imgStart' v-tap='[closeResult]'>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-tel lt-full\" v-if='showTel'>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<img @touchstart='imgStart' :src=\"imgs.telBg\" alt=\"\"  >\r\n\t\t\t\t\t<input  type=\"number\" placeholder=\"请输入手机号码\" v-model=\"tel\">\r\n\t\t\t\t\t<span v-tap='[closeTel]'></span>\r\n\t\t\t\t\t<div v-tap='[submit]'>确认</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-show='showResult' ref='page-result' class=\"zmiti-result-page lt-full\" :style=\"{background:'url('+imgs.resultBg+') no-repeat center top',backgroundSize:'cover'}\">\r\n\t\t\t\t<transition \r\n\t\t\t\t\tname='zmiti-scale'\r\n\t\t\t\t\t@after-enter='afterEnter'\r\n\t\t\t\t>\r\n\t\t\t\t\t<div ref='createimgs' class=\"zmiti-createimg\"  v-if='createImg'>\r\n\t\t\t\t\t\t<img :src=\"createImg\" alt=\"\">\r\n\t\t\t\t\t\t<div v-show='showShareBtn' class=\"zmiti-share-btn\" v-tap='[showMask]'>分享</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</transition>\r\n\t\t\t\t<section v-if='!createImg'>\r\n\t\t\t\t\t<h1 style=\"height:100px;\">\r\n\t\t\t\t\t\t<img :src=\"imgs.c1\" alt=\"\">\r\n\t\t\t\t\t</h1>\r\n\t\t\t\t\t<div class=\"zmiti-pk\" >\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<img :src=\"imgs.team4\" alt=\"\">\r\n\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<img :src=\"imgs.vs\" alt=\"\">\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<img :src=\"imgs.team3\" alt=\"\">\r\n\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-talk-score\">\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">{{team1.score}}</span>\r\n\t\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">{{team2.score}}</span>\r\n\t\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-result-content\">\r\n\t\t\t\t\t\t<img :src=\"imgs.logo3\" alt=\"\">\r\n\t\t\t\t\t\t<div class=\"zmiti-result-user\">\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<img :src=\"headimgurl\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span>{{nickname}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<div>本人预测</div>\r\n\t\t\t\t\t\t\t\t<div>{{text1}}</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-zheng\">\r\n\t\t\t\t\t\t<img :src=\"imgs.zheng\" alt=\"\">\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-qrcode\">\r\n\t\t\t\t\t\t<img :src=\"imgs.qrcode\" alt=\"\">\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</section>\r\n\t\t\t\t<div class=\"zmiti-mask lt-full\" v-if='showMasks' @touchstart='hideMask'>\r\n\t\t\t\t\t<img :src=\"imgs.arrow\">\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t\t<Toast :msg='errorMsg'></Toast>\r\n\t\t</div>\r\n\t\r\n\t</transition>\r\n";
+	module.exports = "\r\n\t<transition name='main'>\r\n\t\r\n\t\t<div class=\"lt-full zmiti-talk-main-ui \" :class=\"{'show':show}\" >\r\n\t\t\t\r\n\t\t\t<section class=\"\"  :style=\"{height:viewH-100+'px',position:'relative'}\">\r\n\t\t\t\t<div  ref='page1' >\r\n\t\t\t\t\t<div class=\"zmiti-talk-title\">\r\n\t\t\t\t\t\t<img :src=\"imgs.talkTitle\" alt=\"\">\r\n\t\t\t\t\t\t<div class=\"zmiti-barrage\" v-for='(barrage,i) in barrageList' :key='i'>\r\n\t\t\t\t\t\t\t<img :src=\"barrage.image\" alt=\"\">\r\n\t\t\t\t\t\t\t<span>{{barrage.name}} : </span>\r\n\t\t\t\t\t\t\t<span>{{barrage.content}}</span>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<section class=\"zmiti-talk-pk-C\">\r\n\t\t\t\t\t\t\t<div class=\"zmiti-pk\" >\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team4\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img style='position:relative' :src=\"imgs.vs\" alt=\"\">\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team3\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"zmiti-pk\" v-show='false'>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team1Ico\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.pk\" alt=\"\">\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.team2Ico\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div class=\"zmiti-talk-score\">\r\n\t\t\t\t\t\t\t\t<section class=\"zmiti-hand\" v-if='showHand'>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.hand\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t\t<section class=\"zmiti-hand1\" v-if='showHand'>\r\n\t\t\t\t\t\t\t\t\t<img :src=\"imgs.hand\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span></span>\r\n\t\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t\t<div v-tap='[showCountdownPage]'>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">\r\n\t\t\t\t\t\t\t\t\t\t\t{{team1.score}}\r\n\t\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">\r\n\t\t\t\t\t\t\t\t\t\t\t{{team2.score}}\r\n\t\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t<div class=\"zmiti-countdown\" v-show='false'>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.countdownBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span>0{{(countdown/60|0)}} : {{countdown%60<10?'0'+countdown%60:countdown%60}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</section>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-talk-content\" :style=\"{background:'url('+imgs.talkBg+') repeat-y',height:viewH-100-350+'px'}\" ref='page'>\r\n\t\t\t\t\t\t<ul ref='ul'>\r\n\t\t\t\t\t\t\t<li style=\"height:100px;\"></li>\r\n\t\t\t\t\t\t\t<li style=\"text-align:center;\r\n\t\t\t\t\t\t\tdisplay:block\">\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.logo3\" alt=\"\" style=\"margin:0 auto;\">\r\n\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t<li v-if='i<=index' v-for='(talk,i) in talkList' :key=\"i\" :class=\"{'right':talk.className}\">\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<img class=\"zmiti-headimg\" :src=\"talk.headimgurl\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t<span>{{talk.nickname}}</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.text'>{{talk.text}}</div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.text && false' style=\"opacity:0;padding:0;\">{{talk.text}}</div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.image' class=\"zmiti-talk-img\">\r\n\t\t\t\t\t\t\t\t\t\t<img  :src=\"talk.image\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t<div v-if='talk.videoposter' class=\"zmiti-talk-img\">\r\n\t\t\t\t\t\t\t\t\t\t<img  :src=\"talk.videoposter\" alt=\"\">\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t<li style=\"height:100px;\"></li>\r\n\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</section>\r\n\t\t\t<div class=\"zmiti-talk-form\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<input type=\"text\" v-model=\"text\" @focus='focus' ref='text'  @blur='blur'>\r\n\t\t\t\t\t<span :class=\"{'active':text.length>0}\" v-tap='[send]'>发送</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-result lt-full\" ref='page2' v-if='result'>\r\n\t\t\t\t<img :src=\"result\" alt=\"\" @touchstart='imgStart' v-tap='[closeResult]'>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-tel lt-full\" v-if='showTel'>\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<img @touchstart='imgStart' :src=\"imgs.telBg\" alt=\"\"  >\r\n\t\t\t\t\t<input  type=\"number\" placeholder=\"请输入手机号码\" v-model=\"tel\">\r\n\t\t\t\t\t<span v-tap='[closeTel]'></span>\r\n\t\t\t\t\t<div v-tap='[submit]'>确认</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t\t<div v-show='showResult' ref='page-result' class=\"zmiti-result-page lt-full\" :style=\"{background:'url('+imgs.resultBg+') no-repeat center top',backgroundSize:'cover'}\">\r\n\t\t\t\t<transition \r\n\t\t\t\t\tname='zmiti-scale'\r\n\t\t\t\t\t@after-enter='afterEnter'\r\n\t\t\t\t>\r\n\t\t\t\t\t<div ref='createimgs' class=\"zmiti-createimg\"  v-if='createImg'>\r\n\t\t\t\t\t\t<img :src=\"createImg\" alt=\"\">\r\n\t\t\t\t\t\t<div v-show='showShareBtn' class=\"zmiti-share-btn\" v-tap='[showMask]'>分享</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</transition>\r\n\t\t\t\t<section v-if='!createImg'>\r\n\t\t\t\t\t<h1 style=\"height:100px;\">\r\n\t\t\t\t\t\t<img :src=\"imgs.c1\" alt=\"\">\r\n\t\t\t\t\t</h1>\r\n\t\t\t\t\t<div class=\"zmiti-pk\" >\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<img :src=\"imgs.team4\" alt=\"\">\r\n\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<img :src=\"imgs.vs\" alt=\"\">\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<img :src=\"imgs.team3\" alt=\"\">\r\n\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-talk-score\">\r\n\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">{{team1.score}}</span>\r\n\t\t\t\t\t\t\t\t<span>{{team1.teamname}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.scoreBg\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span class=\"zmiti-talk-score-item\">{{team2.score}}</span>\r\n\t\t\t\t\t\t\t\t<span>{{team2.teamname}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-result-content\">\r\n\t\t\t\t\t\t<img :src=\"imgs.logo3\" alt=\"\">\r\n\t\t\t\t\t\t<div class=\"zmiti-result-user\">\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<img :src=\"headimgurl\" alt=\"\">\r\n\t\t\t\t\t\t\t\t<span>{{nickname}}</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t<div>本人预测</div>\r\n\t\t\t\t\t\t\t\t<div>{{text1}}</div>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-zheng\">\r\n\t\t\t\t\t\t<img :src=\"imgs.zheng\" alt=\"\">\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"zmiti-qrcode\">\r\n\t\t\t\t\t\t<img :src=\"imgs.qrcode\" alt=\"\">\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</section>\r\n\t\t\t\t<div class=\"zmiti-mask lt-full\" v-if='showMasks' @touchstart='hideMask'>\r\n\t\t\t\t\t<img :src=\"imgs.arrow\">\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<Countdown v-if='show' :obserable='obserable' :team1='team1' :team2='team2'>\r\n\r\n\t\t\t</Countdown>\r\n\t\t\t<Toast :msg='errorMsg'></Toast>\r\n\t\t</div>\r\n\t\r\n\t</transition>\r\n";
 
 /***/ }),
 /* 35 */
