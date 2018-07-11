@@ -49,11 +49,11 @@
 									<img :src="imgs.hand" alt="">
 									<span></span>
 								</section>
-								<div>
+								<div v-tap='[showCountdownPage]'>
 									<div>
 										<img :src="imgs.scoreBg" alt="">
 										<span class="zmiti-talk-score-item">
-											<input type="number" v-model='team1.score'/>
+											{{team1.score}}
 										</span>
 										<span>{{team1.teamname}}</span>
 									</div>
@@ -63,7 +63,8 @@
 									<div>
 										<img :src="imgs.scoreBg" alt="">
 										<span class="zmiti-talk-score-item">
-											<input type="number" v-model='team2.score'/></span>
+											{{team2.score}}
+										</span>
 										<span>{{team2.teamname}}</span>
 									</div>
 								</div>
@@ -189,7 +190,9 @@
 					<img :src="imgs.arrow">
 				</div>
 			</div>
-			
+			<Countdown v-if='show' :obserable='obserable' :team1='team1' :team2='team2'>
+
+			</Countdown>
 			<Toast :msg='errorMsg'></Toast>
 		</div>
 	
@@ -198,7 +201,7 @@
 
 <script>
 	import './index.css';
-	
+	import Countdown from '../countdown/index';
 	import {
 	
 		imgs
@@ -212,7 +215,6 @@
 	
 	import zmitiUtil from '../lib/util';
 
-	import Team from '../team/index';
 	export default {
 	
 		props: ['obserable', 'pv', 'randomPv'],
@@ -229,9 +231,13 @@
 				showQrcode: false,
 				show: false,
 				showHand:true,
-				team1:{},
+				team1:{
+					score:0
+				},
 				points:"",
-				team2:{},
+				team2:{
+					score:0
+				},
 				nickname:'',
 				headimgurl:'',
 				createImg:"",
@@ -253,11 +259,19 @@
 		},
 	
 		components: {
-			Team,
-			Toast
+			Toast,
+			Countdown
 		},
 		methods: {
-
+			showCountdownPage(){
+				var {obserable} = this;
+				obserable.trigger({
+					type:"toggleCountdownPage",
+					data:{
+						show:true
+					}
+				})
+			},
 			hideMask(){
 				this.showMasks = false;
 			},
@@ -541,19 +555,36 @@
 				e.preventDefault(); 
 			},
 			
+			
 		},
 	
 		mounted() {
 			window.s = this;
+			var {obserable} = this;
 
 			this.scroll = new IScroll(this.$refs['page'],{
 				scrollbars:true,
 				///bounce:false
 			});
+			obserable.on('fillScore',data=>{
+				this.team1.score = data.score1;
+				this.team2.score = data.score2;
+			});
+
+			obserable.on('showResultPage',()=>{
+				this.stop = true;
+				clearInterval(this.timer)	
+				setTimeout(() => {
+					if(this.viewH-100-350 - this.$refs['ul'].offsetHeight<=0){
+						this.scroll.scrollTo(0,this.viewH-100-350 - this.$refs['ul'].offsetHeight,100);
+					}
+					this.scroll.refresh();
+					this.showTel = true;
+				}, 500);
+			})
 
 			this.getBarrage();
 			this.getTalk();
-			var {obserable} = this;
 			obserable.on('entryTalk',(data)=>{
 
 				this.show = true;

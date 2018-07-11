@@ -95,6 +95,7 @@
 	import '../lib/html2canvas';
 	import $ from 'jquery';
 	import Point from './point';
+	
 	export default {
 		props:['obserable','nickname','pv'],
 		name:'zmitiindex',
@@ -123,6 +124,7 @@
 			}
 		},
 		components:{
+			
 		},
 		
 		methods:{
