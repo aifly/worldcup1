@@ -4,7 +4,7 @@
 			<span></span>
 			<div class="zmiti-countdown-sure" v-tap='[getScore]'>确定</div>
 			<section class="zmiti-countdown-box">
-				<div class="zmiti-countdown-main" :class="{'active':isTransition}" :style="{WebkitTransform:'rotateX('+rotate+'deg)'}">
+				<div class="zmiti-countdown-main" @transitionend='end1' :class="{'active':isTransition}" :style="{WebkitTransform:'rotateX('+rotate+'deg)'}">
 					<div>
 						<span>0</span>
 						<div>
@@ -25,9 +25,6 @@
 														<span>8</span>
 														<div>
 															<span>9</span>
-															<div>
-																<span>10</span>
-															</div>
 														</div>
 													</div>
 												</div>
@@ -42,7 +39,7 @@
 				</div>
 			</section>
 			<section class="zmiti-countdown-box">
-				<div class="zmiti-countdown-main" :class="{'active':isTransition}" :style="{WebkitTransform:'rotateX('+rotate1+'deg)'}">
+				<div class="zmiti-countdown-main" @transitionend='end1' :class="{'active':isTransition}" :style="{WebkitTransform:'rotateX('+rotate1+'deg)'}">
 					<div>
 						<span>0</span>
 						<div>
@@ -63,9 +60,6 @@
 														<span>8</span>
 														<div>
 															<span>9</span>
-															<div>
-																<span>10</span>
-															</div>
 														</div>
 													</div>
 												</div>
@@ -99,8 +93,9 @@
 				scoreType:'score1',
 				viewW:window.innerWidth,
 				transY:0,
-				isTransition:false,
-				showCountdown:false
+				isTransition:true,
+				showCountdown:false,
+				end:false
 			
 			}
 		},
@@ -108,37 +103,61 @@
 		},
 		
 		methods:{
+			
+			end1(){
+				if(this.end){
+					this.isTransition = false;
+					this[this.type]%=360;
+					
+					if(this.swipe === 'down'){
+						this[this.scoreType] = -(this[this.type]-180) / 36 % 10;
+					}else{
+						this[this.scoreType] =(10 -(this[this.type]-180) / 36 % 10)%10;
+					}
+					//console.log(this[this.scoreType] ,this[this.type]-180,(this[this.type]-180) / 36);
+					this.end = false;
+				}
+			},
 
 			getStartArea(e){
 				var e = e.changedTouches[0];
 				this.type = e.pageX<this.viewW/2 ? 'rotate':'rotate1';
 				this.scoreType = e.pageX<this.viewW/2 ? 'score1':'score2';
 				this.transY = e.pageY;
-				this.isTransition = false;
+				this.isTransition = true;
+
+				
+
 
 				
 			},
 
 			modifyScore(e){
-				var oneAng = 360 / 11;
+				this.end = false;
+				var oneAng = 360 / 10;
 				var e = e.changedTouches[0];
-				this[this.type] +=(this.transY - e.pageY)/ 20 ;
+				this[this.type] +=(this.transY - e.pageY)/ 12;
 			},
 			touchend(e){
+				this.end = true;
 				this.isTransition = true;
-				var oneAng = 360 / 11;
+				var oneAng = 360 / 10;
 				var e = e.changedTouches[0];
-				var scale = ((this[this.type]-180) / oneAng|0);
-				this[this.type] = 180 + scale * oneAng;
+				var defaultRotate = this.defaultRotate;
+				if(this.type  === 'rotate1'){
+					defaultRotate = this.defaultRotate1;
+				}
+				var scale = ((this[this.type]-defaultRotate) / oneAng|0);
+				this[this.type] = defaultRotate + scale * oneAng;
+				
 				if(this.transY > e.pageY){
-
-					this[this.scoreType] = 11 -   Math.abs(scale) % 11;
-					///console.log(this[this.scoreType],'score1');
+					this.swipe = 'up'
 				}else{
-					this[this.scoreType] = Math.abs(scale) % 11;
+					this.swipe = 'down'
+					
 				}
 
-				//console.log(this[this.scoreType],this.scoreType,(this[this.type]-180));
+				//console.log(this[this.scoreType],this[this.type],(this[this.type]%360 - 180 )/oneAng);
 				this.transY = e.pageY
 				
 				
@@ -176,9 +195,11 @@
 			
 		},
 		mounted(){
-
-			this.rotate -= this.team1.score * 360/11;
-			this.rotate1 -= this.team2.score * 360/11;
+			window.s = this;
+			this.rotate -= this.team1.score * 360/10;
+			this.defaultRotate = this.rotate;
+			this.rotate1 -= this.team2.score * 360/10;
+			this.defaultRotate1 = this.rotate1;
 			this.score1 = this.team1.score;
 			this.score2 = this.team2.score;
 			var {obserable} = this;

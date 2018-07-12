@@ -10,7 +10,7 @@
 			</div>
 		</transition>
 		<transition name='index'>
-			<div class="zmiti-index lt-full" v-if='!showIndexMask'>
+			<div class="zmiti-index lt-full" v-if='!showIndexMask' :class="{'blur':createImg}">
 				
 				<div class="zmiti-index-logo">
 					<img :src="imgs.logo2" alt="">
@@ -36,14 +36,14 @@
 							<div class="zmiti-score">
 								<section>
 									<img :src="imgs.xiaoxinTextBg" alt="">
-									<div :style='{marginTop:!showBtns?"36px":"10px"}' v-html='rate'></div>
+									<div :style='{marginTop:!showBtns?"10px":"10px"}' v-html='rate'></div>
 									<div class="zmiti-score-C">
 										<div>
 											<div>
 												
 												<img :src="imgs.scoreBg"  />
 												<label></label>
-												<label></label>
+												<label><img :src="imgs.flag1" alt=""></label>
 												<label></label>
 											</div>
 											<span>{{team1.score}}</span>
@@ -55,7 +55,7 @@
 												
 												<img :src="imgs.scoreBg"  />
 												<label></label>
-												<label></label>
+												<label><img :src="imgs.flag2" alt=""></label>
 												<label></label>
 											</div>
 											<span>{{team2.score}}</span>
@@ -165,6 +165,7 @@
 
 				//zmitiUtil.wxConfig('我是第'+(s.pv)+'位种树者',window.desc)
 				var {obserable} = this;
+
 				setTimeout(()=>{
 					var ref = 'page';
 					var dom = this.$refs[ref];
@@ -172,44 +173,8 @@
 						useCORS: true,
 						onrendered: function(canvas) {
 					        var url =  canvas.toDataURL('image/jpg');
-							console.log(url);
-
+							///console.log(url);
 							 s.createImg = url;
-							 
-							 return
-							
-					        $.ajax({
-					          //url: window.protocol+'//api.zmiti.com/v2/share/base64_image/',
-					          url:window.protocol+'//'+window.server+'.zmiti.com/v2/share/base64_image/',
-					          type: 'post',
-					          data: {
-					            setcontents: url,
-					            setwidth: dom.clientWidth,
-					            setheight:dom.clientHeight
-					          },
-					          error(){
-					          },
-					          success: function(data) {
-					          	//alert('data.getret =>'+data.getret)
-					            if (data.getret === 0) {
-					            	//s.deleteImg(dt.img);
-
-
-					            	s.canShare = true;//可以分享了
-					               var src = data.getimageurl;
-					             
-	
-									var url = window.location.href.split('#')[0];
-
-									url = zmitiUtil.changeURLPar(url,'src',src);
-									url = zmitiUtil.changeURLPar(url,'num',s.pv);
-									zmitiUtil.wxConfig('我是第'+(s.pv)+'位种树者',window.desc,url)
-								       
-					            }else{
-					            }
-
-					          }
-					        })
 
 					      },
 					      width: dom.clientWidth,
@@ -270,7 +235,7 @@
 			getBaseData(){
 				var s = this;
 				$.ajax({
-					url:"http://119.84.122.135:27701/predict/61",
+					url:"http://119.84.122.135:27701/predict/64",
 					success(data){
 						if(typeof data === 'string'){
 							try {
@@ -290,11 +255,11 @@
 									} */
 									s.team1 = data.basedata.teams[1];
 									s.team2 = data.basedata.teams[0];
-									if(s.team1.score>s.team2.score){
-										s.rate = '小新通过<br/>大数据分析预判';
-									}else{
-										s.rate = '小新通过大数据分析预判';
-									}
+									/* if(s.team1.score>s.team2.score){
+										}else{
+											s.rate = '小新通过\n大数据分析预判';
+									} */
+									s.rate = '小新通过<div>大数据分析预判</div>';
 									//if(data.b)
 								}
 							} catch (error) {

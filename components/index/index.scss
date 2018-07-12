@@ -90,7 +90,9 @@ $bgColor: #4081dd;
 
     .zmiti-index {
         @include displayBox(vertical);
-
+        &.blur{
+            -webkit-filter:blur(5px);
+        }
         & > div.zmiti-title {
 			height: 80vh;
 			-webkit-box-flex:1;
@@ -268,16 +270,22 @@ $bgColor: #4081dd;
                                 bottom:0;
                                 z-index: 10;
                                 width: 33.333%;
-                                height: 6px;
+                                height: 16px;
+                                background: #fff;
                                 &:nth-of-type(1){
-                                    background:#001d99;
+                                    //background:#001d99;
                                 }
                                 &:nth-of-type(2){
-                                    background:#fcfcfc;
+                                    //background:#fcfcfc;
                                     left: 33.3%;
+                                    z-index: 100;
+                                    img{
+                                        width: 100%;
+                                        @include pos(a);
+                                        bottom: 0;
+                                    }
                                 }
                                 &:nth-of-type(3){
-                                    background:#f02432;
                                     left: 66.67%;
                                 }
                             }
@@ -298,11 +306,12 @@ $bgColor: #4081dd;
                         &:nth-of-type(3){
                             label{
                                 &:nth-of-type(1){
-                                    background:#000000;
                                 }
                                 &:nth-of-type(2){
-                                    background:#fbe32a;
                                     left: 33.3%;
+                                    img{
+                                        height: 20px;
+                                    }
                                 }
                                
                             }

@@ -7,11 +7,30 @@
 				<div  ref='page1' >
 					<div class="zmiti-talk-title">
 						<img :src="imgs.talkTitle" alt="">
-						<div class="zmiti-barrage" v-for='(barrage,i) in barrageList' :key='i'>
-							<img :src="barrage.image" alt="">
-							<span>{{barrage.name}} : </span>
-							<span>{{barrage.content}}</span>
+						<div class="zmiti-barrage" >
+							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i<2'>
+								<img :src="barrage.image" alt="">
+								<span>{{barrage.name}} : </span>
+								<span>{{barrage.content}}</span>
+							</div>
 						</div>
+
+						<div class="zmiti-barrage"  >
+							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i>=2 && i <4'>
+								<img :src="barrage.image" alt="">
+								<span>{{barrage.name}} : </span>
+								<span>{{barrage.content}}</span>
+							</div>
+						</div>
+
+						<div class="zmiti-barrage"  >
+							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i>=4'>
+								<img :src="barrage.image" alt="">
+								<span>{{barrage.name}} : </span>
+								<span>{{barrage.content}}</span>
+							</div>
+						</div>
+						
 
 						<section class="zmiti-talk-pk-C">
 							<div class="zmiti-pk" >
@@ -40,7 +59,7 @@
 									<span></span>
 								</div>
 							</div>
-							<div class="zmiti-talk-score">
+							<div class="zmiti-talk-score" >
 								<section class="zmiti-hand" v-if='showHand'>
 									<img :src="imgs.hand" alt="">
 									<span></span>
@@ -122,7 +141,7 @@
 				</div>
 			</div>
 
-			<div v-show='showResult' ref='page-result' class="zmiti-result-page lt-full" :style="{background:'url('+imgs.resultBg+') no-repeat center top',backgroundSize:'cover'}">
+			<div v-show='showResult' ref='page-result' class="zmiti-result-page lt-full" :style="{background:'url('+(createImg? imgs.resultBg1 : imgs.resultBg)+') no-repeat center top',backgroundSize:createImg ?'cover':'100% 100%'}">
 				<transition 
 					name='zmiti-scale'
 					@after-enter='afterEnter'
@@ -149,7 +168,7 @@
 							<span>{{team2.teamname}}</span>
 						</div>
 					</div>
-					<div class="zmiti-talk-score">
+					<div class="zmiti-talk-score" v-if='showScore'>
 						<div>
 							<div>
 								<img :src="imgs.scoreBg" alt="">
@@ -175,7 +194,24 @@
 							</div>
 							<div>
 								<div>本人预测</div>
-								<div>{{text1}}</div>
+								<div v-show='text1'>{{text1}}</div>
+								<section v-if='!text1' class="zmiti-talk-score">
+									<div>
+										<div>
+											<img :src="imgs.scoreBg" alt="">
+											<span class="zmiti-talk-score-item">{{team1.score}}</span>
+											<span>{{team1.teamname}}</span>
+										</div>
+										<div>
+											
+										</div>
+										<div>
+											<img :src="imgs.scoreBg" alt="">
+											<span class="zmiti-talk-score-item">{{team2.score}}</span>
+											<span>{{team2.teamname}}</span>
+										</div>
+									</div>
+								</section>
 							</div>
 						</div>
 					</div>
@@ -254,7 +290,8 @@
 				talkList:[],
 				countdown:120,
 				stop:false,
-				showResult:false
+				showResult:false,
+				showScore:true
 			}
 		},
 	
@@ -391,7 +428,7 @@
 				$.getJSON("./assets/data/barrage.json",(data)=>{
 					if(data.code === 0){
 						s.barrageList = data.list;
-						s.barrageList.length = 5;
+						s.barrageList.length = 6;
 					}
 				});
 			},
@@ -430,6 +467,7 @@
 								s.errorMsg = '';
 								s.showTel = false;
 								s.showResult = true;
+								s.showScore = false;
 								setTimeout(() => {
 									s.html2img('page-result');	
 								}, 600);
@@ -478,7 +516,7 @@
 				}); */
 				$.ajax({
 					type:'get',
-					url:'http://119.84.122.135:27701/reply/61',
+					url:'http://119.84.122.135:27701/reply/64',
 					data:{
 						
 					},

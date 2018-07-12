@@ -13,6 +13,10 @@ $color: #fffb88;
     @include displayBox(vertical);
 
 
+    &>section{
+    }
+
+
     .zmiti-createimg {
         @include transform(scale(.75));
         @include transformOrigin(center 45%); //border: 5px solid $color;
@@ -56,6 +60,7 @@ $color: #fffb88;
 
     .zmiti-result-page{
         z-index: 199000;
+        -webkit-filter: blur(0px);
         .zmiti-result-content{
             width: 600px;
             height: 500px;
@@ -82,11 +87,13 @@ $color: #fffb88;
                  &>div:nth-of-type(2) {
                      &>div{
                          &:nth-of-type(1){
-                             font-size:70px;
+                             font-size:60px;
                              font-weight: bold;
                          }
                          &:nth-of-type(2){
-                             color:#fafa8f;
+                             color:#fff;
+                             font-size:56px;
+                             font-weight: bold;
                          }
                      }
                  }
@@ -273,39 +280,72 @@ $color: #fffb88;
 
         .zmiti-barrage {
             @include pos(a);
-
-            left: 100%;
+            //left: $viewW;
             top: 0;
+
+            
             color: #fff;
-            -webkit-animation: move 4s linear infinite;
-            width: 100%;
+            
+            width: $viewW*2;
+            
+            @include displayBox(horizontal);
+            -webkit-box-pack:start;
+           
+
+            &>div{
+                margin: 0 20px;
+                
+                left: $viewW;
+                -webkit-animation: move 15s linear infinite;
+            }
+
+             &:nth-of-type(1){
+                &>div{
+
+                }
+             }
+
+            &:nth-of-type(2){
+                top: 40px;
+                &>div{
+                    -webkit-animation: move1 12s linear infinite;
+                }
+            }
+
+            &:nth-of-type(3) {
+                top: 80px;
+                -webkit-animation: move2 16s linear infinite;
+            }
             img{
                 width: 40px;
                 @include br();
             }
         }
 
-        @for $i from 1 through 30 {
-           
-            .zmiti-barrage:nth-of-type(#{$i}){
-                $time:6s;
-                -webkit-animation: move 8s *random(5) $i*2s  linear infinite;
-                
-                @if $i % 3 == 0 {
-                    top:40px;
-                     //-webkit-animation-duration: $time+2;
-                }
-                @if $i % 3 == 1 {
-                    top: 80px;
-                    //-webkit-animation-duration: $time+4;
-                }
-                
-            }
-        }
+       
 
         @-webkit-keyframes move{
+            from{
+                -webkit-transform: translate3d(750px, 0, 0)
+            }
             to{
-                -webkit-transform: translate3d(-1250px,0,0)
+                -webkit-transform: translate3d(-1200px,0,0)
+            }
+        }
+        @-webkit-keyframes move1{
+             from {
+                 -webkit-transform: translate3d(750px, 0, 0)
+             }
+            to{
+                -webkit-transform: translate3d(-1650px,0,0)
+            }
+        }
+        @-webkit-keyframes move2 {
+             from {
+                 -webkit-transform: translate3d(750px, 0, 0)
+             }
+            to {
+                -webkit-transform: translate3d(-1250px, 0, 0)
             }
         }
 
@@ -403,6 +443,10 @@ $color: #fffb88;
             letter-spacing: 20px;
             font-weight: bold;
             margin-top: -20px; */
+
+            &>div>div{
+                margin: 0 !important;
+            }
             .zmiti-hand,.zmiti-hand1{
                 @include pos(a);
                 left: 58%;
