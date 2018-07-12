@@ -244,19 +244,12 @@
 	
 	} from '../lib/assets.js';
 	import Toast from '../toast/toast'
-
 	import IScroll from 'iscroll';
-	
 	import $ from 'jquery';
-	
 	import zmitiUtil from '../lib/util';
-
 	export default {
-	
 		props: ['obserable', 'pv', 'randomPv'],
-	
 		name: 'zmitiindex',
-	
 		data() {
 	
 			return {

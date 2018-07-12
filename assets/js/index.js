@@ -23116,11 +23116,8 @@
 	var _libUtil2 = _interopRequireDefault(_libUtil);
 
 	exports['default'] = {
-
 		props: ['obserable', 'pv', 'randomPv'],
-
 		name: 'zmitiindex',
-
 		data: function data() {
 
 			return {
