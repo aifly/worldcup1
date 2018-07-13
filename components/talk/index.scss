@@ -294,8 +294,8 @@ $color: #fffb88;
 
             &>div{
                 margin: 0 20px;
-                
-                left: $viewW;
+                -webkit-transform: translate3d(750px, 0, 0);
+              //  left: $viewW;
                 -webkit-animation: move 15s linear infinite;
             }
 
@@ -326,7 +326,7 @@ $color: #fffb88;
 
         @-webkit-keyframes move{
             from{
-                -webkit-transform: translate3d(750px, 0, 0)
+                -webkit-transform: translate3d(1000px, 0, 0)
             }
             to{
                 -webkit-transform: translate3d(-1200px,0,0)
@@ -334,7 +334,7 @@ $color: #fffb88;
         }
         @-webkit-keyframes move1{
              from {
-                 -webkit-transform: translate3d(750px, 0, 0)
+                 -webkit-transform: translate3d(1000px, 0, 0)
              }
             to{
                 -webkit-transform: translate3d(-1650px,0,0)
@@ -342,7 +342,7 @@ $color: #fffb88;
         }
         @-webkit-keyframes move2 {
              from {
-                 -webkit-transform: translate3d(750px, 0, 0)
+                 -webkit-transform: translate3d(1000px, 0, 0)
              }
             to {
                 -webkit-transform: translate3d(-1250px, 0, 0)
@@ -351,7 +351,6 @@ $color: #fffb88;
 
         .zmiti-talk-pk-C {
             @include pos(a);
-
             top: 120px;
             width: 100%;
         }

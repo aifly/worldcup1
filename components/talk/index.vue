@@ -418,7 +418,7 @@
 				})
 
 				return;*/
-				$.getJSON("./assets/data/barrage.json",(data)=>{
+				$.getJSON("./assets/data/barrage.json?t="+new Date().getTime(),(data)=>{
 					if(data.code === 0){
 						s.barrageList = data.list;
 						s.barrageList.length = 6;

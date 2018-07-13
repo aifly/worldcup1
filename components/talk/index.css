@@ -333,7 +333,7 @@
 
 .zmiti-talk-main-ui > section .zmiti-barrage > div {
   margin: 0 20px;
-  left: 750px;
+  -webkit-transform: translate3d(750px, 0, 0);
   -webkit-animation: move 15s linear infinite;
 }
 
@@ -357,7 +357,7 @@
 
 @-webkit-keyframes move {
   from {
-    -webkit-transform: translate3d(750px, 0, 0);
+    -webkit-transform: translate3d(1000px, 0, 0);
   }
   to {
     -webkit-transform: translate3d(-1200px, 0, 0);
@@ -366,7 +366,7 @@
 
 @-webkit-keyframes move1 {
   from {
-    -webkit-transform: translate3d(750px, 0, 0);
+    -webkit-transform: translate3d(1000px, 0, 0);
   }
   to {
     -webkit-transform: translate3d(-1650px, 0, 0);
@@ -375,7 +375,7 @@
 
 @-webkit-keyframes move2 {
   from {
-    -webkit-transform: translate3d(750px, 0, 0);
+    -webkit-transform: translate3d(1000px, 0, 0);
   }
   to {
     -webkit-transform: translate3d(-1250px, 0, 0);
