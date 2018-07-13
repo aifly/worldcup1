@@ -8,7 +8,7 @@
 					<div class="zmiti-talk-title">
 						<img :src="imgs.talkTitle" alt="">
 						<div class="zmiti-barrage" >
-							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i<2'>
+							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i%3===2'>
 								<img :src="barrage.image" alt="">
 								<span>{{barrage.name}} : </span>
 								<span>{{barrage.content}}</span>
@@ -16,7 +16,7 @@
 						</div>
 
 						<div class="zmiti-barrage"  >
-							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i>=2 && i <4'>
+							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i%3===0'>
 								<img :src="barrage.image" alt="">
 								<span>{{barrage.name}} : </span>
 								<span>{{barrage.content}}</span>
@@ -24,7 +24,7 @@
 						</div>
 
 						<div class="zmiti-barrage"  >
-							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i>=4'>
+							<div v-for='(barrage,i) in barrageList' :key='i' v-if='i%3===1'>
 								<img :src="barrage.image" alt="">
 								<span>{{barrage.name}} : </span>
 								<span>{{barrage.content}}</span>
@@ -421,7 +421,7 @@
 				$.getJSON("./assets/data/barrage.json?t="+new Date().getTime(),(data)=>{
 					if(data.code === 0){
 						s.barrageList = data.list;
-						s.barrageList.length = 6;
+						//s.barrageList.length = 6;
 					}
 				});
 			},
