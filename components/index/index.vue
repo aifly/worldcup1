@@ -74,6 +74,10 @@
 						<img :src="imgs.c1" alt="">
 					</div>
 				</div>
+
+				<div class="zmiti-qrcode" v-if='!showBtns'>
+					<img :src="imgs.qrcode" alt="">
+				</div>	
 				<canvas :width="viewW" height="900" ref='canvas'>
 
 				</canvas>
